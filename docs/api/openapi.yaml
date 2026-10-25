@@ -1,0 +1,216 @@
+openapi: 3.0.3
+
+info:
+  title: Review Sentiment Analyzer API
+  description: >
+    API для автоматического анализа тональности отзывов на маркетплейсе.
+    Определяет, является ли отзыв положительным, нейтральным или отрицательным.
+  version: 1.0.0
+
+servers:
+  - url: https://sentiment_analyzer.com/api/v1
+
+paths:
+  /analysis:
+    post:
+      summary: Отправить отзыв на анализ тональности
+      description: >
+        Принимает текст отзыва, запускает ML-модель и возвращает
+        определённую тональность (positive / neutral / negative),
+        уверенность модели и версию модели.
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  description: Текст отзыва
+                  example: Отличный товар, доставили быстро!
+                productId:
+                  type: integer
+                  description: Идентификатор товара, к которому относится отзыв
+                  example: 42
+
+      responses:
+        '201':
+          description: Анализ выполнен, результат сохранён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResult'
+
+        '400':
+          description: Некорректный запрос — текст отзыва пустой или отсутствует
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: INVALID_TEXT
+                  message:
+                    type: string
+                    example: Text must not be empty
+
+        '500':
+          description: Внутренняя ошибка сервиса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: INTERNAL_ERROR
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /analysis/{id}:
+    get:
+      summary: Получить результат анализа по идентификатору
+      description: Возвращает сохранённый результат анализа конкретного отзыва.
+
+      parameters:
+        - name: id          
+          in: path
+          required: true
+          description: Идентификатор результата анализа
+          schema:
+            type: integer
+            example: 101
+
+      responses:
+        '200':
+          description: Результат найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResult'
+
+        '404':
+          description: Результат с указанным id не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: RESULT_NOT_FOUND
+                  message:
+                    type: string
+                    example: Analysis result not found
+
+        '500':
+          description: Внутренняя ошибка сервиса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: INTERNAL_ERROR
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /models:
+    get:
+      summary: Получить список доступных моделей анализа
+      description: >
+        Возвращает информацию о ML-моделях: название, версию
+        и поддерживаемые классы тональности.
+      responses:
+        '200':
+          description: Список моделей
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: sentiment-classifier
+                        version:
+                          type: string
+                          example: "1.2.0"
+                        classes:
+                          type: array
+                          items:
+                            type: string
+                          example: [positive, neutral, negative]
+
+        '503':
+          description: Сервис моделей временно недоступен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: MODEL_SERVICE_UNAVAILABLE
+                  message:
+                    type: string
+                    example: Model service is temporarily unavailable
+
+        '500':
+          description: Внутренняя ошибка сервиса
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: INTERNAL_ERROR
+                  message:
+                    type: string
+                    example: Internal server error
+
+
+components:
+  schemas:
+
+    AnalysisResult:
+      type: object
+      description: Сохранённый результат анализа тональности отзыва
+      properties:
+        resultId:
+          type: integer
+          example: 101
+        text:
+          type: string
+          example: Отличный товар, доставили быстро!
+        productId:
+          type: integer
+          example: 42
+        sentiment:
+          type: string
+          enum: [positive, neutral, negative]
+          example: positive
+        confidence:
+          type: number
+          format: float
+          example: 0.94
+        modelVersion:
+          type: string
+          example: "1.2.0"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-10-25T12:00:00Z"

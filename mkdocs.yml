@@ -16,4 +16,4 @@ nav:
       - Архитектура системы: project/architecture.md
       - Документация ML-модели: project/ml-model.md
       - Руководство пользователя: project/user-guide.md
-      
+      - API: api/index.md

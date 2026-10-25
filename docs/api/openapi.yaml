@@ -18,7 +18,9 @@ paths:
         Принимает текст отзыва, запускает ML-модель и возвращает
         определённую тональность (positive / neutral / negative),
         уверенность модели и версию модели.
-
+        Результат анализа сохраняется как ресурс с уникальным
+        идентификатором resultId и в дальнейшем доступен
+        через GET /analysis/{id}.
       requestBody:
         required: true
         content:
@@ -30,7 +32,11 @@ paths:
               properties:
                 text:
                   type: string
-                  description: Текст отзыва
+                  description: >
+                    Текст отзыва. Не может быть пустым и не может
+                    состоять только из пробельных символов.
+                  minLength: 1
+                  pattern: '\S'
                   example: Отличный товар, доставили быстро!
                 productId:
                   type: integer
@@ -46,7 +52,9 @@ paths:
                 $ref: '#/components/schemas/AnalysisResult'
 
         '400':
-          description: Некорректный запрос — текст отзыва пустой или отсутствует
+          description: >
+            Некорректный запрос: текст отзыва отсутствует, пустой
+            или состоит только из пробельных символов.
           content:
             application/json:
               schema:
@@ -57,7 +65,7 @@ paths:
                     example: INVALID_TEXT
                   message:
                     type: string
-                    example: Text must not be empty
+                    example: Text must not be empty or contain only whitespace
 
         '500':
           description: Внутренняя ошибка сервиса

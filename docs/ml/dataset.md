@@ -22,7 +22,7 @@ A. Rogers A. Romanov A. Rumshisky S. Volkova M. Gronas A. Gribov RuSentiment: An
 Тексты постов социальной сети «ВКонтакте» на русском языке. Короткие тексты разговорного стиля, характерные для социальных медиа .
 
 **Основные поля / признаки:**  
-Текст поста и метка тональности: positive, negative, neutral.
+Текст поста и метка: positive, negative, neutral, speech act и skip.
 
 ## Получение данных
 
@@ -44,7 +44,8 @@ A. Rogers A. Romanov A. Rumshisky S. Volkova M. Gronas A. Gribov RuSentiment: An
 
 ## Использование в проекте
 
-Датасет RuSentiment — это обучающая основа для модели blanchefort/rubert-base-cased-sentiment-rusentiment, которая используется в проекте «Анализатор отзывов» для определения тональности отзывов покупателей.
+Датасет RuSentiment — это обучающая основа для модели blanchefort/rubert-base-cased-sentiment-rusentiment, которая используется в проекте «Анализатор отзывов» для определения тональности отзывов покупателей. 
+Используется только три класса: positive, negative, neutral.
 
 ## Источники
 
